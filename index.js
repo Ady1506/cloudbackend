@@ -18,7 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(cors());
 // CORS setup
 // const frontendOrigin = process.env.NODE_ENV === 'production' ? 'https://your-production-frontend-url.com' : 'http://localhost:5173';
-const frontendOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+// const frontendOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+const frontendOrigin = process.env.FRONTEND_URL;
+
 
 app.use(
   cors({
