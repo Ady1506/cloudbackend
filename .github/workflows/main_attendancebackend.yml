@@ -1,5 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+# GitHub Actions Workflow for attendancebackend
 
 name: Build and deploy container app to Azure Web App - attendancebackend
 
@@ -11,41 +10,41 @@ on:
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Log in to registry
+    - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
         registry: https://index.docker.io/v1/
-        username: ${{ secrets.AzureAppService_ContainerUsername_d58e1cc83bb3460386f7d28cb2919f44 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_a0157a08eede4b1ead5a8b7ce05ecb50 }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push container image to registry
+    - name: Build and push container image to Docker Hub
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_d58e1cc83bb3460386f7d28cb2919f44 }}/ady1506/cloudbackend:${{ github.sha }}
-        file: ./Dockerfile
+        tags: index.docker.io/${{ secrets.DOCKER_USERNAME }}/cloudbackend:${{ github.sha }}
+        file: ./dockerfile
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
     - name: Deploy to Azure Web App
-      id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'attendancebackend'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_fb976b25732c4972a76a0073e7a59fd1 }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_d58e1cc83bb3460386f7d28cb2919f44 }}/ady1506/cloudbackend:${{ github.sha }}'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
+        images: 'index.docker.io/${{ secrets.DOCKER_USERNAME }}/cloudbackend:${{ github.sha }}'
